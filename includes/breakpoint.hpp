@@ -10,6 +10,7 @@ namespace Fdbg
   class Breakpoint
   {
     public:
+      Breakpoint() = default;
       Breakpoint(pid_t pid, std::intptr_t addr)
         : m_Pid{pid}, m_Addr{addr}, m_Enabled{false}, m_SavedData{}
       {}

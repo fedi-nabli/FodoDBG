@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/ptrace.h>
+#include <sys/personality.h>
 
 namespace Fdbg
 {
@@ -22,6 +23,7 @@ namespace Fdbg
     {
       // We're in the child process
       // execute debugee
+      personality(ADDR_NO_RANDOMIZE);
       ptrace(PTRACE_TRACEME, 0, nullptr, nullptr);
       execl(prog, prog, nullptr);
     }
@@ -30,7 +32,7 @@ namespace Fdbg
       // We're in the parent process
       // execute debugger
       std::cout << "Started debugging process " << pid << std::endl;
-      Debugger dbg(prog, pid);
+      Debugger dbg {prog, pid};
       dbg.run();
     }
 

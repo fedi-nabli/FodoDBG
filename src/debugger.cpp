@@ -46,6 +46,14 @@ namespace Fdbg
     }
   }
 
+  void Debugger::set_breakpoint_at_address(std::intptr_t addr)
+  {
+    std::cout << "Set breakpoint at address 0x" << std::hex << addr << std::endl;
+    Breakpoint bp {m_Pid, addr};
+    bp.enable();
+    m_Breakpoints[addr] = bp;
+  }
+
   void Debugger::handle_command(const std::string& line)
   {
     auto args = split(line, ' ');
@@ -54,6 +62,11 @@ namespace Fdbg
     if (is_prefix(command, "continue"))
     {
       continue_execution();
+    }
+    else if (is_prefix(command, "break"))
+    {
+      std::string addr { args[1], 2 }; // Natively we assume that the user has written 0xADDRESS
+      set_breakpoint_at_address(std::stol(addr, 0, 16));
     }
     else
     {
