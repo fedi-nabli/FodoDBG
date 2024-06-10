@@ -9,7 +9,18 @@ include_directories(
   external/linenoise
 )
 
+file(GLOB FDBG_CPP_FILES "src/*.cpp")
+file(GLOB FDBG_HPP_FILES "includes/*.hpp")
+
+set(FDBG_SOURCES
+  ${FDBG_CPP_FILES}
+  ${FDBG_HPP_FILES}
+)
+add_library(fdbgl STATIC ${FDBG_SOURCES})
+
 add_executable(${Executable} app/main.cpp external/linenoise/linenoise.c)
+target_include_directories(${Executable} PUBLIC includes)
+target_link_libraries(${Executable} fdbgl)
 
 add_custom_target(
   libelfin
