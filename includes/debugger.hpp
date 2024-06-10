@@ -15,6 +15,10 @@ namespace Fdbg
       void run();
 
     private:
+      void handle_command(const std::string& line);
+      void continue_execution();
+
+    private:
       std::string m_ProgName;
       pid_t m_Pid;
   };

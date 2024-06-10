@@ -32,3 +32,6 @@ target_link_libraries(${Executable}
   ${PROJECT_SOURCE_DIR}/external/libelfin/elf/libelf++.so
 )
 add_dependencies(${Executable} libelfin)
+
+add_executable(hello tests/hello.cc)
+set_target_properties(hello PROPERTIES COMPILE_FLAGS "-g -O0")
