@@ -1,6 +1,8 @@
 #include "debugger.hpp"
+#include "registers.hpp"
 
 #include <vector>
+#include <iomanip>
 #include <sstream>
 #include <iostream>
 #include <unistd.h>
@@ -81,5 +83,13 @@ namespace Fdbg
     int wait_status;
     auto options = 0;
     waitpid(m_Pid, &wait_status, options);
+  }
+
+  void Debugger::dump_registers()
+  {
+    for (const auto& rd : g_register_descriptors)
+    {
+      std::cout << rd.name << "0x" << std::setfill('0') << std::setw(16) << std::hex << get_register_value(m_Pid, rd.r) << std::endl;
+    }
   }
 }

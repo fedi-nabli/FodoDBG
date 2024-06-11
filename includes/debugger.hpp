@@ -16,6 +16,7 @@ namespace Fdbg
         : m_ProgName{std::move(prog_name)}, m_Pid{pid} {}
 
       void run();
+      void dump_registers();
       void set_breakpoint_at_address(std::intptr_t addr);
 
     private:

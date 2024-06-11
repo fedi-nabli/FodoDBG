@@ -2,8 +2,8 @@
 
 #include <cstdint>
 #include <unistd.h>
-#include <linux/types.h>
 #include <sys/ptrace.h>
+#include <linux/types.h>
 
 namespace Fdbg
 {
@@ -15,12 +15,12 @@ namespace Fdbg
         : m_Pid{pid}, m_Addr{addr}, m_Enabled{false}, m_SavedData{}
       {}
 
-      inline void enable()
+      void enable()
       {
         auto data = ptrace(PTRACE_PEEKDATA, m_Pid, m_Addr, nullptr);
         m_SavedData = static_cast<uint8_t>(data & 0xff); // Save bottom byte
         uint64_t int3 = 0xcc;
-        uint64_t data_with_int3 = ((data & ~0xff) | int3);
+        uint64_t data_with_int3 = ((data & ~0xff) | int3); // set bottom byte to 0xcc
         ptrace(PTRACE_POKEDATA, m_Pid, m_Addr, data_with_int3);
 
         m_Enabled = true;
