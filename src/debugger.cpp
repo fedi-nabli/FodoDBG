@@ -70,6 +70,22 @@ namespace Fdbg
       std::string addr { args[1], 2 }; // Natively we assume that the user has written 0xADDRESS
       set_breakpoint_at_address(std::stol(addr, 0, 16));
     }
+    else if (is_prefix(command, "register"))
+    {
+      if (is_prefix(args[1], "dump"))
+      {
+        dump_registers();
+      }
+      else if (is_prefix(args[1], "read"))
+      {
+        std::cout << get_register_value(m_Pid, get_register_from_name(args[2])) << std::endl;
+      }
+      else if (is_prefix(args[1], "write"))
+      {
+        std::string val { args[3], 2 };
+        set_register_value(m_Pid, get_register_from_name(args[2]), std::stol(val, 0, 16));
+      }
+    }
     else
     {
       std::cerr << "Unknown command" << std::endl;
