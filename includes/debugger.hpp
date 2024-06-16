@@ -23,6 +23,9 @@ namespace Fdbg
       void handle_command(const std::string& line);
       void continue_execution();
 
+      auto read_memory(uint64_t address) -> uint64_t;
+      auto write_memory(uint64_t address, uint64_t value) -> void;
+
     private:
       std::string m_ProgName;
       pid_t m_Pid;

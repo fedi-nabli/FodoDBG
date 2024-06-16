@@ -56,6 +56,14 @@ namespace Fdbg
     m_Breakpoints[addr] = bp;
   }
 
+  void Debugger::dump_registers()
+  {
+    for (const auto& rd : g_register_descriptors)
+    {
+      std::cout << rd.name << "0x" << std::setfill('0') << std::setw(16) << std::hex << get_register_value(m_Pid, rd.r) << std::endl;
+    }
+  }
+
   void Debugger::handle_command(const std::string& line)
   {
     auto args = split(line, ' ');
@@ -86,6 +94,20 @@ namespace Fdbg
         set_register_value(m_Pid, get_register_from_name(args[2]), std::stol(val, 0, 16));
       }
     }
+    else if (is_prefix(command, "memory"))
+    {
+      std::string addr { args[2], 2 };
+
+      if (is_prefix(args[1], "read"))
+      {
+        std::cout << std::hex << read_memory(std::stol(addr, 0, 16)) << std::endl;
+      }
+      else if (is_prefix(args[1], "write"))
+      {
+        std::string val { args[3], 2 };
+        write_memory(std::stol(addr, 0, 16), std::stol(val, 0, 16));
+      }
+    }
     else
     {
       std::cerr << "Unknown command" << std::endl;
@@ -101,11 +123,13 @@ namespace Fdbg
     waitpid(m_Pid, &wait_status, options);
   }
 
-  void Debugger::dump_registers()
+  uint64_t Debugger::read_memory(uint64_t address)
   {
-    for (const auto& rd : g_register_descriptors)
-    {
-      std::cout << rd.name << "0x" << std::setfill('0') << std::setw(16) << std::hex << get_register_value(m_Pid, rd.r) << std::endl;
-    }
+    return ptrace(PTRACE_PEEKDATA, m_Pid, address, nullptr);
+  }
+
+  void Debugger::write_memory(uint64_t address, uint64_t value)
+  {
+    ptrace(PTRACE_POKEDATA, m_Pid, address, value);
   }
 }
