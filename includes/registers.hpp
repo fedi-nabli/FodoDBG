@@ -78,7 +78,7 @@ namespace Fdbg
     ptrace(PTRACE_GETREGS, pid, nullptr, &regs);
     
     auto it = std::find_if(begin(g_register_descriptors), end(g_register_descriptors),
-                            [r](auto&& rd) { return rd.d == r; });
+                            [r](auto&& rd) { return rd.r == r; });
     *(reinterpret_cast<uint64_t*>(&regs) + (it - begin(g_register_descriptors))) = value;
 
     ptrace(PTRACE_SETREGS, pid, nullptr, &regs);

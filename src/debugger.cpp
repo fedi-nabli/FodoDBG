@@ -116,8 +116,43 @@ namespace Fdbg
 
   void Debugger::continue_execution()
   {
+    step_over_breakpoint();
     ptrace(PTRACE_CONT, m_Pid, nullptr, nullptr);
+    wait_for_signal();
+  }
 
+  uint64_t Debugger::get_pc()
+  {
+    return get_register_value(m_Pid, reg::rip);
+  }
+
+  void Debugger::set_pc(uint64_t pc)
+  {
+    set_register_value(m_Pid, reg::rip, pc);
+  }
+
+  void Debugger::step_over_breakpoint() {
+    // -1 because execution will go past the breakpoint
+    auto possible_breakpoint_location = get_pc() - 1;
+
+    if (m_Breakpoints.count(possible_breakpoint_location))
+    {
+      auto& bp = m_Breakpoints[possible_breakpoint_location];
+
+      if (bp.is_enabled()) {
+        auto previous_instruction_address = possible_breakpoint_location;
+        set_pc(previous_instruction_address);
+
+        bp.disable();
+        ptrace(PTRACE_SINGLESTEP, m_Pid, nullptr, nullptr);
+        wait_for_signal();
+        bp.enable();
+      }
+    }
+  }
+
+  void Debugger::wait_for_signal()
+  {
     int wait_status;
     auto options = 0;
     waitpid(m_Pid, &wait_status, options);
